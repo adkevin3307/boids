@@ -5,9 +5,9 @@ SOURCES = $(wildcard src/*.cpp)
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
 
-CXXFLAGS = -std=c++17 -I./include -Wall -O2
+CXXFLAGS = -std=c++17 -Iinclude -Wall -O2
 
-LIBS = -L./lib -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lGLEW
+LIBS = -Llib -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lGLEW
 
 all: create_object_directory $(EXE)
 	@echo Compile Success
