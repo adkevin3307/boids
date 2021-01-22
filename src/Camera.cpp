@@ -20,7 +20,6 @@ Camera::Camera()
 
 Camera::~Camera()
 {
-
 }
 
 void Camera::update()
@@ -37,16 +36,16 @@ void Camera::update()
     this->_up = glm::normalize(glm::cross(this->_right, front));
 }
 
-void Camera::process_mouse(BUTTON button, double xoffset, double yoffset)
+void Camera::process_mouse(CONSTANT::BUTTON button, double xoffset, double yoffset)
 {
-    if (button == BUTTON::LEFT) {
+    if (button == CONSTANT::BUTTON::LEFT) {
         this->_yaw += xoffset * this->_sensitivity;
         this->_pitch += yoffset * this->_sensitivity;
 
         if (this->_pitch > 89.0f) this->_pitch = 89.0f;
         if (this->_pitch < -89.0f) this->_pitch = -89.0f;
     }
-    else if (button == BUTTON::RIGHT) {
+    else if (button == CONSTANT::BUTTON::RIGHT) {
         this->_center += (float)(xoffset * this->_sensitivity) * this->_right;
         this->_center += (float)(yoffset * this->_sensitivity) * this->_up;
     }

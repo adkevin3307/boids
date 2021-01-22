@@ -25,5 +25,5 @@ public:
     glm::vec3 up();
     glm::vec3 position();
 
-    void process_mouse(BUTTON button, double xoffset, double yoffset);
+    void process_mouse(CONSTANT::BUTTON button, double xoffset, double yoffset);
 };

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "constant.h"
+
 using namespace std;
 
 void error_callback(int error, const char* description)
@@ -16,9 +18,8 @@ void APIENTRY debug_callback(
     GLuint id,
     GLenum severity,
     GLsizei length,
-    const GLchar *message,
-    const void *userParam
-)
+    const GLchar* message,
+    const void* userParam)
 {
     // ignore non-significant error / warning codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -92,48 +93,40 @@ void APIENTRY debug_callback(
     }
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
-void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     switch (key) {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, true);
             break;
         // case GLFW_KEY_SPACE:
-            // this->camera.reset();
-            // break;
-        // case GLFW_KEY_LEFT_CONTROL: case GLFW_KEY_RIGHT_CONTROL:
-            // ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-            // break;
+        // this->camera.reset();
+        // break;
         default:
             break;
     }
 }
 
-void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     // if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        // this->camera.process_mouse(BUTTON::LEFT, xpos - this->last_xpos, this->last_ypos - ypos);
+    // this->camera.process_mouse(BUTTON::LEFT, xpos - this->last_xpos, this->last_ypos - ypos);
     // }
     // if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        // this->camera.process_mouse(BUTTON::RIGHT, this->last_xpos - xpos, ypos - this->last_ypos);
+    // this->camera.process_mouse(BUTTON::RIGHT, this->last_xpos - xpos, ypos - this->last_ypos);
     // }
 
     // this->last_xpos = xpos;
     // this->last_ypos = ypos;
 }
 
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    // if (ImGui::IsAnyWindowHovered()) {
-        // ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-        // return;
-    // }
-
     // this->rate += yoffset;
     // if (this->rate < 0.1) this->rate = 0.1;
 }
@@ -141,19 +134,19 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 void set_callback(GLFWwindow* window)
 {
     // auto framebufferSizeCallback = [](GLFWwindow *window, int width, int height) {
-        // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->framebuffer_size_callback(window, width, height);
+    // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->framebuffer_size_callback(window, width, height);
     // };
 
     // auto keyCallback = [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-        // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->key_callback(window, key, scancode, action, mods);
+    // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->key_callback(window, key, scancode, action, mods);
     // };
 
     // auto mouseCallback = [](GLFWwindow *window, double xpos, double ypos) {
-        // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->mouse_callback(window, xpos, ypos);
+    // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->mouse_callback(window, xpos, ypos);
     // };
 
     // auto scrollCallback = [](GLFWwindow *window, double xoffset, double yoffset) {
-        // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->scroll_callback(window, xoffset, yoffset);
+    // static_cast<WindowManagement *>(glfwGetWindowUserPointer(window))->scroll_callback(window, xoffset, yoffset);
     // };
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -172,7 +165,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "window", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(CONSTANT::WIDTH, CONSTANT::HEIGHT, "window", nullptr, nullptr);
 
     if (!window) {
         glfwTerminate();
