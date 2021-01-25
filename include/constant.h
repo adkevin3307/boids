@@ -18,4 +18,5 @@ namespace CONSTANT {
 
     const static int WIDTH = 1440;
     const static int HEIGHT = 900;
+    const static int DEPTH = 5000;
 }; // namespace CONSTANT

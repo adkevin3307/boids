@@ -5,6 +5,8 @@
 
 #include "constant.h"
 #include "Transformation.h"
+#include "BufferManagement.h"
+#include "Birds.h"
 
 using namespace std;
 
@@ -17,14 +19,7 @@ Window::~Window()
 {
 }
 
-void APIENTRY debug_callback(
-    GLenum source,
-    GLenum type,
-    GLuint id,
-    GLenum severity,
-    GLsizei length,
-    const GLchar* message,
-    const void* userParam)
+void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
     // ignore non-significant error / warning codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -207,38 +202,13 @@ void Window::init()
 
     this->set_callback();
 
-    this->shader = Shader(
-        "./src/shader/vertex.glsl",
-        "./src/shader/fragment.glsl"
-    );
+    this->shader = Shader("./src/shader/vertex.glsl", "./src/shader/fragment.glsl");
 }
 
 void Window::main_loop()
 {
-    float vertices[] = {
-        -100.0, -100.0, 0.0,
-        100.0, -100.0, 0.0,
-        0.0, 100.0, 0.0
-    };
-
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
+    Birds birds(100);
+    Buffer buffer = BufferManagement::generate();
 
     while (!glfwWindowShouldClose(this->window)) {
         glClearColor(0.2, 0.2, 0.2, 1.0);
@@ -247,13 +217,21 @@ void Window::main_loop()
         this->shader.use();
 
         Transformation transformation(this->shader);
-        transformation.set_projection(CONSTANT::WIDTH, CONSTANT::HEIGHT, this->rate, -5000.0, 5000.0);
+        transformation.set_projection(CONSTANT::WIDTH, CONSTANT::HEIGHT, this->rate, CONSTANT::DEPTH * -1, CONSTANT::DEPTH);
         transformation.set_view(this->camera.view_matrix());
 
         transformation.set();
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        birds.update();
+
+        BufferManagement::bind(buffer);
+        BufferManagement::fill(birds.vertices());
+        BufferManagement::set(0, 3, 3, 0);
+        BufferManagement::unbind();
+
+        BufferManagement::bind(buffer);
+        BufferManagement::draw(buffer, 0, 100, GL_POINTS, GL_FILL);
+        BufferManagement::unbind();
 
         glfwSwapBuffers(this->window);
         glfwPollEvents();

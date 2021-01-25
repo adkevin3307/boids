@@ -80,6 +80,9 @@ void Transformation::set_projection(GLfloat width, GLfloat height, GLfloat rate,
 
 void Transformation::set(bool set_model)
 {
-    if (set_model) this->shader.set_uniform("model", this->_model);
+    if (set_model) {
+        this->shader.set_uniform("model", this->_model);
+    }
+
     this->shader.set_uniform("projection_view_model", (this->_projection * this->_view * this->_model));
 }
