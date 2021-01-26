@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "GLFW/glfw3.h"
 #include "constant.h"
 #include "Transformation.h"
 #include "BufferManagement.h"
@@ -11,7 +12,7 @@
 using namespace std;
 
 Window::Window()
-    : last_xpos(0.0), last_ypos(0.0), rate(7.0)
+    : last_xpos(0.0), last_ypos(0.0), rate(3.0)
 {
 }
 
@@ -135,7 +136,7 @@ void Window::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    this->rate += yoffset;
+    this->rate += yoffset / 10.0;
     if (this->rate < 0.1) this->rate = 0.1;
 }
 
@@ -207,7 +208,9 @@ void Window::init()
 
 void Window::main_loop()
 {
-    Birds birds(100);
+    size_t size = 500;
+
+    Birds birds(size);
     Buffer buffer = BufferManagement::generate();
 
     while (!glfwWindowShouldClose(this->window)) {
@@ -216,26 +219,31 @@ void Window::main_loop()
 
         this->shader.use();
 
+        this->shader.set_uniform("view_pos", this->camera.position());
+        this->shader.set_uniform("light_pos", this->camera.position());
+
         Transformation transformation(this->shader);
         transformation.set_projection(CONSTANT::WIDTH, CONSTANT::HEIGHT, this->rate, CONSTANT::DEPTH * -1, CONSTANT::DEPTH);
         transformation.set_view(this->camera.view_matrix());
 
-        transformation.set();
+        transformation.set(true);
 
         birds.update();
 
         BufferManagement::bind(buffer);
         BufferManagement::fill(birds.vertices());
-        BufferManagement::set(0, 3, 3, 0);
+        BufferManagement::set(0, 3, birds.stride(), 0);
+        BufferManagement::set(1, 3, birds.stride(), 3 * sizeof(GLfloat));
         BufferManagement::unbind();
 
         BufferManagement::bind(buffer);
-        BufferManagement::draw(buffer, 0, 100, GL_POINTS, GL_FILL);
+        BufferManagement::draw(buffer, 0, size, GL_TRIANGLES, GL_FILL);
         BufferManagement::unbind();
 
         glfwSwapBuffers(this->window);
         glfwPollEvents();
     }
 
+    glfwDestroyWindow(this->window);
     glfwTerminate();
 }

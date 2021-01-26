@@ -5,7 +5,8 @@
 
 #include "constant.h"
 
-#define GENERATE_RANGE 100
+#define GENERATE_RANGE 500
+#define VERTICES_STRIDE 6
 
 using namespace std;
 
@@ -33,7 +34,7 @@ Birds::Birds(size_t size)
     auto random = bind(distribution, generator);
 
     this->_birds.resize(size);
-    this->_vertices.resize(size * 3);
+    this->_vertices.resize(3 * size * VERTICES_STRIDE);
 
     for (size_t i = 0; i < this->_birds.size(); i++) {
         glm::vec3 position(random() * GENERATE_RANGE, random() * GENERATE_RANGE, random() * GENERATE_RANGE);
@@ -52,25 +53,145 @@ Birds::~Birds()
     this->_vertices.shrink_to_fit();
 }
 
+void Birds::cohesion(size_t index)
+{
+    float visual_range = 100;
+
+    int count = 0;
+    glm::vec3 center(0.0);
+
+    for (size_t i = 0; i < this->_birds.size(); i++) {
+        if (glm::distance(this->_birds[index].position, this->_birds[i].position) < visual_range) {
+            count += 1;
+            center += this->_birds[i].position;
+        }
+    }
+
+    if (count) {
+        center /= (float)count;
+
+        this->_birds[index].velocity += ((center - this->_birds[index].position) * 0.05f);
+    }
+}
+
+void Birds::separation(size_t index)
+{
+    float min_distance = 50;
+
+    glm::vec3 move(0.0);
+
+    for (size_t i = 0; i < this->_birds.size(); i++) {
+        if (i == index) continue;
+
+        if (glm::distance(this->_birds[index].position, this->_birds[i].position) < min_distance) {
+            move += (this->_birds[index].position - this->_birds[i].position);
+        }
+    }
+
+    this->_birds[index].velocity += (move * 0.05f);
+}
+
+void Birds::alignment(size_t index)
+{
+    float visual_range = 100;
+
+    int count = 0;
+    glm::vec3 average_velocity(0.0);
+
+    for (size_t i = 0; i < this->_birds.size(); i++) {
+        if (glm::distance(this->_birds[index].position, this->_birds[i].position) < visual_range) {
+            count += 1;
+            average_velocity += this->_birds[i].velocity;
+        }
+    }
+
+    if (count) {
+        average_velocity /= (float)count;
+
+        this->_birds[index].velocity += ((average_velocity - this->_birds[index].velocity) * 0.05f);
+    }
+}
+
 void Birds::convert()
 {
     // TODO tetrahedron
     int index = 0;
     for (auto bird : this->_birds) {
-        this->_vertices[index++] = bird.position.x;
-        this->_vertices[index++] = bird.position.y;
-        this->_vertices[index++] = bird.position.z;
+        glm::vec3 normal = glm::cross(bird.velocity, glm::vec3(0.0, 1.0, 0.0));
+
+        glm::vec3 front = glm::normalize(bird.velocity) * 25.0f;
+        glm::vec3 side = glm::normalize(glm::cross(bird.velocity, normal)) * 10.0f;
+
+        this->_vertices[index++] = bird.position.x + front.x;
+        this->_vertices[index++] = bird.position.y + front.y;
+        this->_vertices[index++] = bird.position.z + front.z;
+
+        this->_vertices[index++] = normal.x;
+        this->_vertices[index++] = normal.y;
+        this->_vertices[index++] = normal.z;
+        
+        this->_vertices[index++] = bird.position.x + side.x;
+        this->_vertices[index++] = bird.position.y + side.y;
+        this->_vertices[index++] = bird.position.z + side.z;
+
+        this->_vertices[index++] = normal.x;
+        this->_vertices[index++] = normal.y;
+        this->_vertices[index++] = normal.z;
+
+        this->_vertices[index++] = bird.position.x - side.x;
+        this->_vertices[index++] = bird.position.y - side.y;
+        this->_vertices[index++] = bird.position.z - side.z;
+
+        this->_vertices[index++] = normal.x;
+        this->_vertices[index++] = normal.y;
+        this->_vertices[index++] = normal.z;
     }
 }
 
 void Birds::update()
 {
-    // TODO separation, alignment, cohesion
-    for (size_t i = 0; i < this->_birds.size(); i++) {
-        this->_birds[i].position += glm::vec3(1.0);
+    float max_speed = 10.0;
+    glm::vec3 margin(GENERATE_RANGE + 100.0f);
+
+    for (size_t index = 0; index < this->_birds.size(); index++) {
+        this->cohesion(index);
+        this->separation(index);
+        this->alignment(index);
+
+        if (glm::length(this->_birds[index].velocity) > max_speed) {
+            this->_birds[index].velocity = glm::normalize(this->_birds[index].velocity) * max_speed;
+        }
+
+        if (this->_birds[index].position.x < margin.x) {
+            this->_birds[index].velocity.x += 1.0f;
+        }
+        if (this->_birds[index].position.x > margin.x * -1.0f) {
+            this->_birds[index].velocity.x -= 1.0f;
+        }
+
+        if (this->_birds[index].position.y < margin.y) {
+            this->_birds[index].velocity.y += 1.0f;
+        }
+        if (this->_birds[index].position.y > margin.y * -1.0f) {
+            this->_birds[index].velocity.y -= 1.0f;
+        }
+
+        if (this->_birds[index].position.z < margin.z) {
+            this->_birds[index].velocity.z += 1.0f;
+        }
+        if (this->_birds[index].position.z > margin.z * -1.0f) {
+            this->_birds[index].velocity.z -= 1.0f;
+        }
+
+        this->_birds[index].position += this->_birds[index].velocity;
     }
 
     this->convert();
+}
+
+int Birds::stride()
+{
+    return VERTICES_STRIDE;
 }
 
 vector<GLfloat>& Birds::vertices()

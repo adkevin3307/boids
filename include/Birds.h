@@ -23,6 +23,9 @@ private:
     vector<Bird> _birds;
     vector<GLfloat> _vertices;
 
+    void cohesion(size_t index);
+    void separation(size_t index);
+    void alignment(size_t index);
     void convert();
 
 public:
@@ -30,5 +33,7 @@ public:
     ~Birds();
 
     void update();
+
+    int stride();
     vector<GLfloat>& vertices();
 };
