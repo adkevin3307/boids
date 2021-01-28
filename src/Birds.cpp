@@ -112,9 +112,43 @@ void Birds::alignment(size_t index)
     }
 }
 
+void Birds::speed(size_t index)
+{
+    float max_speed = 10.0;
+
+    if (glm::length(this->_birds[index].velocity) > max_speed) {
+        this->_birds[index].velocity = glm::normalize(this->_birds[index].velocity) * max_speed;
+    }
+}
+
+void Birds::bound(size_t index)
+{
+    glm::vec3 margin(GENERATE_RANGE + 100.0f);
+
+    if (this->_birds[index].position.x < margin.x) {
+        this->_birds[index].velocity.x += 1.0f;
+    }
+    if (this->_birds[index].position.x > margin.x * -1.0f) {
+        this->_birds[index].velocity.x -= 1.0f;
+    }
+
+    if (this->_birds[index].position.y < margin.y) {
+        this->_birds[index].velocity.y += 1.0f;
+    }
+    if (this->_birds[index].position.y > margin.y * -1.0f) {
+        this->_birds[index].velocity.y -= 1.0f;
+    }
+
+    if (this->_birds[index].position.z < margin.z) {
+        this->_birds[index].velocity.z += 1.0f;
+    }
+    if (this->_birds[index].position.z > margin.z * -1.0f) {
+        this->_birds[index].velocity.z -= 1.0f;
+    }
+}
+
 void Birds::convert()
 {
-    // TODO tetrahedron
     int index = 0;
     for (auto bird : this->_birds) {
         glm::vec3 normal = glm::cross(bird.velocity, glm::vec3(0.0, 1.0, 0.0));
@@ -150,38 +184,13 @@ void Birds::convert()
 
 void Birds::update()
 {
-    float max_speed = 10.0;
-    glm::vec3 margin(GENERATE_RANGE + 100.0f);
-
     for (size_t index = 0; index < this->_birds.size(); index++) {
         this->cohesion(index);
         this->separation(index);
         this->alignment(index);
 
-        if (glm::length(this->_birds[index].velocity) > max_speed) {
-            this->_birds[index].velocity = glm::normalize(this->_birds[index].velocity) * max_speed;
-        }
-
-        if (this->_birds[index].position.x < margin.x) {
-            this->_birds[index].velocity.x += 1.0f;
-        }
-        if (this->_birds[index].position.x > margin.x * -1.0f) {
-            this->_birds[index].velocity.x -= 1.0f;
-        }
-
-        if (this->_birds[index].position.y < margin.y) {
-            this->_birds[index].velocity.y += 1.0f;
-        }
-        if (this->_birds[index].position.y > margin.y * -1.0f) {
-            this->_birds[index].velocity.y -= 1.0f;
-        }
-
-        if (this->_birds[index].position.z < margin.z) {
-            this->_birds[index].velocity.z += 1.0f;
-        }
-        if (this->_birds[index].position.z > margin.z * -1.0f) {
-            this->_birds[index].velocity.z -= 1.0f;
-        }
+        this->speed(index);
+        this->bound(index);
 
         this->_birds[index].position += this->_birds[index].velocity;
     }

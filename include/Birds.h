@@ -26,6 +26,9 @@ private:
     void cohesion(size_t index);
     void separation(size_t index);
     void alignment(size_t index);
+    void speed(size_t index);
+    void bound(size_t index);
+
     void convert();
 
 public:
