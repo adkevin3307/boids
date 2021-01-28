@@ -55,7 +55,7 @@ Birds::~Birds()
 
 void Birds::cohesion(size_t index)
 {
-    float visual_range = 100;
+    float visual_range = 150;
 
     int count = 0;
     glm::vec3 center(0.0);
@@ -76,7 +76,7 @@ void Birds::cohesion(size_t index)
 
 void Birds::separation(size_t index)
 {
-    float min_distance = 50;
+    float min_distance = 75;
 
     glm::vec3 move(0.0);
 
@@ -93,7 +93,7 @@ void Birds::separation(size_t index)
 
 void Birds::alignment(size_t index)
 {
-    float visual_range = 100;
+    float visual_range = 150;
 
     int count = 0;
     glm::vec3 average_velocity(0.0);
@@ -123,27 +123,27 @@ void Birds::speed(size_t index)
 
 void Birds::bound(size_t index)
 {
-    glm::vec3 margin(GENERATE_RANGE + 100.0f);
+    glm::vec3 _margin(GENERATE_RANGE + log2(this->_birds.size()) * 30);
 
-    if (this->_birds[index].position.x < margin.x) {
-        this->_birds[index].velocity.x += 1.0f;
+    if (this->_birds[index].position.x < _margin.x) {
+        this->_birds[index].velocity.x += 1.0;
     }
-    if (this->_birds[index].position.x > margin.x * -1.0f) {
-        this->_birds[index].velocity.x -= 1.0f;
-    }
-
-    if (this->_birds[index].position.y < margin.y) {
-        this->_birds[index].velocity.y += 1.0f;
-    }
-    if (this->_birds[index].position.y > margin.y * -1.0f) {
-        this->_birds[index].velocity.y -= 1.0f;
+    if (this->_birds[index].position.x > _margin.x * -1.0) {
+        this->_birds[index].velocity.x -= 1.0;
     }
 
-    if (this->_birds[index].position.z < margin.z) {
-        this->_birds[index].velocity.z += 1.0f;
+    if (this->_birds[index].position.y < _margin.y) {
+        this->_birds[index].velocity.y += 1.0;
     }
-    if (this->_birds[index].position.z > margin.z * -1.0f) {
-        this->_birds[index].velocity.z -= 1.0f;
+    if (this->_birds[index].position.y > _margin.y * -1.0) {
+        this->_birds[index].velocity.y -= 1.0;
+    }
+
+    if (this->_birds[index].position.z < _margin.z) {
+        this->_birds[index].velocity.z += 1.0;
+    }
+    if (this->_birds[index].position.z > _margin.z * -1.0) {
+        this->_birds[index].velocity.z -= 1.0;
     }
 }
 

@@ -208,7 +208,7 @@ void Window::init()
 
 void Window::main_loop()
 {
-    size_t size = 500;
+    size_t size = 1000;
 
     Birds birds(size);
     Buffer buffer = BufferManagement::generate();
