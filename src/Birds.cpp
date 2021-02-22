@@ -163,7 +163,7 @@ void Birds::convert()
         this->_vertices[index++] = normal.x;
         this->_vertices[index++] = normal.y;
         this->_vertices[index++] = normal.z;
-        
+
         this->_vertices[index++] = bird.position.x + side.x;
         this->_vertices[index++] = bird.position.y + side.y;
         this->_vertices[index++] = bird.position.z + side.z;

@@ -14,13 +14,13 @@ Buffer BufferManagement::generate()
     return buffer;
 }
 
-void BufferManagement::bind(Buffer &buffer)
+void BufferManagement::bind(Buffer& buffer)
 {
     glBindVertexArray(buffer.vertex_array);
     glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex_buffer);
 }
 
-void BufferManagement::fill(vector<GLfloat> &vertex)
+void BufferManagement::fill(vector<GLfloat>& vertex)
 {
     glBufferData(GL_ARRAY_BUFFER, vertex.size() * sizeof(GLfloat), vertex.data(), GL_STATIC_DRAW);
 }
@@ -37,7 +37,7 @@ void BufferManagement::unbind()
     glBindVertexArray(0);
 }
 
-void BufferManagement::draw(Buffer &buffer, int first, int count, GLenum render_mode, GLenum rasterize_mode)
+void BufferManagement::draw(Buffer& buffer, int first, int count, GLenum render_mode, GLenum rasterize_mode)
 {
     glPolygonMode(GL_FRONT_AND_BACK, rasterize_mode);
     glDrawArrays(render_mode, first, count);
